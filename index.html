@@ -6,265 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Flip Card Deck — Click to Reveal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #E8DAFF;
-            /* lilac */
-            --card-bg: #0a0a0a;
-            /* black */
-            --accent: #8a6cff;
-        }
-
-        * {
-            box-sizing: border-box
-        }
-
-        html,
-        body {
-            height: 100%
-        }
-
-        body {
-            margin: 0;
-            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-            background: linear-gradient(180deg, var(--bg), #f3e8ff 60%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            color: #111;
-        }
-
-        .app {
-            width: 100%;
-            max-width: 980px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 18px;
-            padding: 28px;
-            backdrop-filter: blur(8px) saturate(120%);
-            box-shadow: 0 10px 30px rgba(138, 108, 255, 0.12);
-            display: grid;
-            grid-template-columns: 1fr 360px;
-            gap: 20px;
-            align-items: start;
-        }
-
-        .left {
-            padding: 12px 8px;
-        }
-
-        .hero {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-        }
-
-        h1 {
-            font-size: 20px;
-            margin: 0;
-            color: #2b1b57
-        }
-
-        p.lead {
-            margin: 0;
-            color: #3b2b5a;
-            opacity: 0.9
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .btn {
-            appearance: none;
-            border: 0;
-            cursor: pointer;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            background: linear-gradient(180deg, var(--accent), #684ff4);
-            color: white;
-            box-shadow: 0 6px 18px rgba(106, 88, 255, 0.18);
-        }
-
-        .btn.secondary {
-            background: transparent;
-            color: var(--accent);
-            border: 1px solid rgba(107, 87, 255, 0.12);
-            box-shadow: none;
-            font-weight: 600;
-        }
-
-        .meta {
-            margin-top: 12px;
-            color: #52457a;
-            font-size: 14px
-        }
-
-        /* card area */
-        .stage {
-            min-height: 420px;
-            /* increased to make room for the lowered stack */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            perspective: 1200px;
-            padding-bottom: 90px;
-            /* ensures minis don't overlap main content */
-        }
-
-        .card {
-            width: 320px;
-            height: 200px;
-            border-radius: 16px;
-            background: var(--card-bg);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 22px;
-            text-align: center;
-            padding: 18px;
-            box-shadow: 0 12px 30px rgba(10, 10, 10, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3) inset;
-            transform-style: preserve-3d;
-            backface-visibility: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        /* flip entrance animation */
-        .card.enter {
-            animation: flipIn 700ms cubic-bezier(.2, .9, .2, 1);
-        }
-
-        @keyframes flipIn {
-            0% {
-                transform: rotateY(-90deg) translateY(8px) scale(.98);
-                opacity: 0
-            }
-
-            60% {
-                transform: rotateY(12deg) translateY(-6px) scale(1.01);
-                opacity: 1
-            }
-
-            100% {
-                transform: rotateY(0deg) translateY(0) scale(1)
-            }
-        }
-
-        /* small history stack */
-        .stack {
-            position: absolute;
-            left: 12px;
-            bottom: 8px;
-            /* bring into the padded area so it's visually lower but inside container */
-            display: flex;
-            gap: 18px;
-            /* more spacing between cards */
-            align-items: flex-end;
-            transform: translateY(12px);
-        }
-
-        .mini {
-            width: 105px;
-            /* 50% wider */
-            height: 66px;
-            /* 50% taller */
-            border-radius: 12px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.04));
-            transform-origin: center;
-            box-shadow: 0 8px 20px rgba(30, 20, 60, 0.07), inset 0 -2px 6px rgba(0, 0, 0, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: #2b1b57;
-            font-weight: 700;
-            padding: 8px;
-            text-align: center;
-            opacity: 0.95;
-        }
-
-        /* right pane */
-        .right {
-            padding: 8px 12px;
-            border-left: 1px solid rgba(43, 27, 87, 0.06);
-        }
-
-        .panel {
-            background: white;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 6px 18px rgba(25, 18, 60, 0.04);
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            color: #46355f;
-            margin-bottom: 6px
-        }
-
-        .deck-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px
-        }
-
-        .deck-item {
-            background: linear-gradient(180deg, #faf7ff, #f5efff);
-            padding: 8px;
-            border-radius: 10px;
-            font-size: 13px;
-            color: #3b2b5a
-        }
-
-        .small {
-            font-size: 13px;
-            color: #6a5a88
-        }
-
-        /* responsive */
-        @media (max-width:900px) {
-            .app {
-                grid-template-columns: 1fr;
-            }
-
-            .right {
-                order: 2
-            }
-
-            .stage {
-                min-height: 360px;
-                padding-bottom: 70px
-            }
-
-            .stack {
-                left: 10px;
-                gap: 12px
-            }
-
-            .mini {
-                width: 90px;
-                height: 56px;
-                font-size: 13px
-            }
-        }
-
-        /* footer */
-        .footer {
-            margin-top: 16px;
-            font-size: 13px;
-            color: #6d5ca1
-        }
-    </style>
+    <link href="styles.css" rel="stylesheet">
 </head>
 
 <body>
@@ -272,13 +14,12 @@
         <div class="left">
             <div class="hero">
                 <div>
-                    <h1>Flip Card Deck</h1>
-                    <p class="lead">Click the button to reveal a randomly chosen card from a deck of 10. Cards flip in
-                        with a sleek animation.</p>
+                    <h1>Conversation cards</h1>
+
                 </div>
                 <div style="text-align:right">
                     <div class="small">Deck: <strong id="remaining">10</strong> left</div>
-                    <div class="small">Theme: <strong>lilac • black cards</strong></div>
+                    <div class="small">Current: <strong id="currentDeck">Dating</strong></div>
                 </div>
             </div>
 
@@ -290,20 +31,18 @@
             <div class="controls">
                 <button class="btn" id="revealBtn">Reveal Card</button>
                 <button class="btn secondary" id="resetBtn">Reset Deck</button>
-                <button class="btn secondary" id="editBtn">Edit Deck</button>
             </div>
 
-            <div class="meta">Tip: You can edit card texts in the right panel or via the Edit Deck button to swap
-                content.</div>
+            <div class="meta">Choose a deck from the right panel to get started with different conversation topics.</div>
         </div>
 
         <aside class="right">
             <div class="panel">
-                <label>Card texts (editable)</label>
-                <div class="deck-list" id="deckList">
-                    <!-- items injected by JS -->
+                <label>Choose a Deck</label>
+                <div class="deck-selection" id="deckSelection">
+                    <!-- deck options will be injected here -->
                 </div>
-                <div class="footer">Change any text to customize the deck. Click Save to persist for this session.</div>
+                <div class="footer">Select a deck to start revealing conversation cards. Each deck contains 10 unique cards.</div>
             </div>
         </aside>
     </div>
@@ -313,36 +52,78 @@
     </template>
 
     <script>
-        // ==== CONFIG: change these 10 strings to whatever random text you like ====
-        const defaultDeck = [
-            "Brave new idea",
-            "Coffee first, plan later",
-            "Sketch your future",
-            "Tiny steps win races",
-            "Breathe — then act",
-            "Question assumptions",
-            "Design with empathy",
-            "Try. Fail. Learn.",
-            "Keep curiosity alive",
-            "Ship the imperfect"
-        ];
-        // =======================================================================
+        // ==== DECK CONFIGURATION ====
+        const decks = {
+            dating: {
+                name: "Dating",
+                cards: [
+                    "What's your ideal first date?",
+                    "Share your most embarrassing moment",
+                    "What's your love language?",
+                    "Describe your perfect partner",
+                    "What's your biggest relationship fear?",
+                    "Share a childhood memory",
+                    "What makes you laugh the most?",
+                    "Describe your dream vacation",
+                    "What's your biggest pet peeve?",
+                    "Share something you're passionate about"
+                ]
+            },
+            friends: {
+                name: "Friends",
+                cards: [
+                    "What's your favorite childhood game?",
+                    "Share your most random skill",
+                    "What's your go-to comfort food?",
+                    "Describe your perfect weekend",
+                    "What's the weirdest dream you've had?",
+                    "Share your favorite joke",
+                    "What's your hidden talent?",
+                    "Describe your ideal party",
+                    "What's your biggest irrational fear?",
+                    "Share your favorite memory with friends"
+                ]
+            },
+            dilemmas: {
+                name: "Dilemmas",
+                cards: [
+                    "Would you rather have super strength or super speed?",
+                    "What's your biggest moral dilemma?",
+                    "Would you rather be famous or wealthy?",
+                    "What's the hardest decision you've made?",
+                    "Would you rather live in the past or future?",
+                    "What's your biggest ethical question?",
+                    "Would you rather be invisible or fly?",
+                    "What's your most controversial opinion?",
+                    "Would you rather have perfect memory or forget everything?",
+                    "What's your biggest philosophical question?"
+                ]
+            }
+        };
 
         // state
-        let deck = [...defaultDeck];
+        let currentDeckType = 'dating';
+        let deck = [...decks[currentDeckType].cards];
         let remaining = [];
 
         const stage = document.getElementById('stage');
         const revealBtn = document.getElementById('revealBtn');
         const resetBtn = document.getElementById('resetBtn');
-        const editBtn = document.getElementById('editBtn');
         const remainingEl = document.getElementById('remaining');
-        const deckList = document.getElementById('deckList');
+        const currentDeckEl = document.getElementById('currentDeck');
+        const deckSelection = document.getElementById('deckSelection');
         const stack = document.getElementById('stack');
 
         function init() {
+            renderDeckSelection();
+            switchDeck('dating');
+        }
+
+        function switchDeck(deckType) {
+            currentDeckType = deckType;
+            deck = [...decks[deckType].cards];
+            currentDeckEl.textContent = decks[deckType].name;
             resetDeck();
-            renderDeckList();
         }
 
         function resetDeck() {
@@ -358,42 +139,32 @@
             remainingEl.textContent = remaining.length;
         }
 
-        function renderDeckList() {
-            deckList.innerHTML = '';
-            deck.forEach((t, i) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'deck-item';
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = t;
-                input.style.width = '100%';
-                input.style.border = 'none';
-                input.style.background = 'transparent';
-                input.style.font = 'inherit';
-                input.style.outline = 'none';
-                input.addEventListener('change', (e) => {
-                    deck[i] = e.target.value || 'Card ' + (i + 1);
-                    saveDeckToSession();
+        function renderDeckSelection() {
+            deckSelection.innerHTML = '';
+            Object.keys(decks).forEach(deckType => {
+                const deckOption = document.createElement('div');
+                deckOption.className = `deck-option ${deckType === currentDeckType ? 'active' : ''}`;
+                deckOption.innerHTML = `
+                    <div class="deck-name">${decks[deckType].name}</div>
+                    <div class="deck-description">${getDeckDescription(deckType)}</div>
+                `;
+                deckOption.addEventListener('click', () => {
+                    switchDeck(deckType);
+                    // Update active state
+                    document.querySelectorAll('.deck-option').forEach(opt => opt.classList.remove('active'));
+                    deckOption.classList.add('active');
                 });
-                wrapper.appendChild(input);
-                deckList.appendChild(wrapper);
+                deckSelection.appendChild(deckOption);
             });
         }
 
-        // persist in session storage so edits survive reloads in same tab
-        function saveDeckToSession() {
-            try { sessionStorage.setItem('flipdeck', JSON.stringify(deck)); } catch (e) { }
-        }
-        function loadDeckFromSession() {
-            try {
-                const j = sessionStorage.getItem('flipdeck');
-                if (j) {
-                    const arr = JSON.parse(j);
-                    if (Array.isArray(arr) && arr.length === 10) {
-                        deck = arr.slice();
-                    }
-                }
-            } catch (e) { }
+        function getDeckDescription(deckType) {
+            const descriptions = {
+                dating: "Conversation starters for romantic connections",
+                friends: "Fun questions for hanging out with friends", 
+                dilemmas: "Thought-provoking scenarios and choices"
+            };
+            return descriptions[deckType];
         }
 
         function pickRandomCard() {
@@ -412,6 +183,8 @@
                 const tpl = document.getElementById('miniTpl');
                 const mini = tpl.content.firstElementChild.cloneNode(true);
                 mini.textContent = prev.textContent;
+                // Scale text for mini card
+                scaleMiniTextToFit(mini);
                 // stack up to 4 minis
                 stack.insertBefore(mini, stack.firstChild);
                 if (stack.children.length > 4) stack.removeChild(stack.lastChild);
@@ -425,9 +198,80 @@
             card.textContent = item.text;
             stage.appendChild(card);
 
+            // Scale text to fit the card
+            scaleTextToFit(card);
+
             // small focus for keyboard users
             card.tabIndex = -1;
             setTimeout(() => card.focus(), 350);
+        }
+
+        function scaleTextToFit(card) {
+            const text = card.textContent;
+            const cardRect = card.getBoundingClientRect();
+            const maxWidth = cardRect.width - 48; // Account for padding
+            const maxHeight = cardRect.height - 48; // Account for padding
+            
+            // Start with a larger base font size
+            let fontSize = 24;
+            card.style.fontSize = fontSize + 'px';
+            
+            // Create a temporary element to measure text
+            const temp = document.createElement('div');
+            temp.style.position = 'absolute';
+            temp.style.visibility = 'hidden';
+            temp.style.whiteSpace = 'nowrap';
+            temp.style.fontSize = fontSize + 'px';
+            temp.style.fontWeight = '600';
+            temp.style.fontFamily = 'Inter, system-ui, sans-serif';
+            temp.textContent = text;
+            document.body.appendChild(temp);
+            
+            // Scale down until text fits, with higher minimum size
+            while ((temp.offsetWidth > maxWidth || temp.offsetHeight > maxHeight) && fontSize > 16) {
+                fontSize -= 0.5;
+                temp.style.fontSize = fontSize + 'px';
+            }
+            
+            // Clean up
+            document.body.removeChild(temp);
+            
+            // Apply the calculated font size
+            card.style.fontSize = fontSize + 'px';
+        }
+
+        function scaleMiniTextToFit(mini) {
+            const text = mini.textContent;
+            const miniRect = mini.getBoundingClientRect();
+            const maxWidth = miniRect.width - 16; // Account for padding
+            const maxHeight = miniRect.height - 16; // Account for padding
+            
+            // Start with a larger base font size for mini cards
+            let fontSize = 16;
+            mini.style.fontSize = fontSize + 'px';
+            
+            // Create a temporary element to measure text
+            const temp = document.createElement('div');
+            temp.style.position = 'absolute';
+            temp.style.visibility = 'hidden';
+            temp.style.whiteSpace = 'nowrap';
+            temp.style.fontSize = fontSize + 'px';
+            temp.style.fontWeight = '700';
+            temp.style.fontFamily = 'Inter, system-ui, sans-serif';
+            temp.textContent = text;
+            document.body.appendChild(temp);
+            
+            // Scale down until text fits, with higher minimum size
+            while ((temp.offsetWidth > maxWidth || temp.offsetHeight > maxHeight) && fontSize > 10) {
+                fontSize -= 0.5;
+                temp.style.fontSize = fontSize + 'px';
+            }
+            
+            // Clean up
+            document.body.removeChild(temp);
+            
+            // Apply the calculated font size
+            mini.style.fontSize = fontSize + 'px';
         }
 
         revealBtn.addEventListener('click', () => {
@@ -443,17 +287,24 @@
             resetDeck();
         });
 
-        editBtn.addEventListener('click', () => {
-            // on small screens, focus the right panel by scrolling
-            const right = document.querySelector('.right');
-            right.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-
         // allow Enter key on reveal button
         revealBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter') revealBtn.click(); });
 
-        // on load, try to restore saved deck
-        loadDeckFromSession();
+        // Handle window resize to rescale text
+        window.addEventListener('resize', () => {
+            const currentCard = stage.querySelector('.card');
+            if (currentCard) {
+                scaleTextToFit(currentCard);
+            }
+            
+            // Rescale all mini cards
+            const miniCards = stack.querySelectorAll('.mini');
+            miniCards.forEach(mini => {
+                scaleMiniTextToFit(mini);
+            });
+        });
+
+        // initialize the app
         init();
     </script>
 </body>
